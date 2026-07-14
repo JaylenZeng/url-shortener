@@ -11,3 +11,6 @@
   - optional "relationship()" function that doesn't create a column, but allows us to navigate between objects in Python without writing manual queries. If we want the owning user of a link, we can just get that by asking SQLalchemy to fetch it for us.
   - Mapped[x]: maps Python type to SQL type
   - mapped_column: function that actually makes the column
+- Learned basic routing and syntax in FastAPI
+- Learned how to communicate with Postgres through SQLAlchemy.ext.asyncio
+  - SessionMaker is the factory that churns out AsyncSessions for our routes to use
