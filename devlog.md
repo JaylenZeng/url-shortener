@@ -14,3 +14,22 @@
 - Learned basic routing and syntax in FastAPI
 - Learned how to communicate with Postgres through SQLAlchemy.ext.asyncio
   - SessionMaker is the factory that churns out AsyncSessions for our routes to use
+- "Depends" keyword is FastAPI's dependency injection marker. It tells FastAPI to wait for a function to be ran before running a route
+- How to use alembic:
+```
+# 1. Edit models.py (add a column, new table, etc.)
+
+# 2. Generate a migration — alembic diffs your models against current DB state
+uv run alembic revision --autogenerate -m "add expires_at to links"
+
+# 3. Review the generated file in alembic/versions/ — autogenerate isn't perfect,
+#    especially with renamed columns, index changes, or type migrations
+
+# 4. Apply it
+uv run alembic upgrade head
+
+# Other useful commands
+uv run alembic current        # what migration is the DB currently at
+uv run alembic history        # list all migrations
+uv run alembic downgrade -1   # roll back one migration (undo)
+```
