@@ -1,7 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import get_db
@@ -9,8 +8,6 @@ from app.models import Link, User
 from app.schemas.links import CreateLinkRequest, LinkResponse
 from app.services.auth_service import get_current_user
 from app.services.link_service import create_link_service, delete_link_service
-from app.exceptions import LinkNotFoundError
-from datetime import datetime, timezone
 
 router = APIRouter(prefix="/links", tags=["links"])
 

@@ -1,10 +1,19 @@
+### Register
+POST http://localhost:8000/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@gmail.com",
+  "password": "abc123456"
+}
+
 ### Login
 POST http://localhost:8000/auth/login
 Content-Type: application/json
 
 {
-  "email": "jaylenzeng@gmail.com",
-  "password": "bkny11223"
+  "email": "test@gmail.com",
+  "password": "abc123456"
 }
 
 ### Create a short link
@@ -23,8 +32,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMjUxNWFiY
 Content-Type: application/json
 
 ### Delete a short link (soft delete)
-DELETE http://localhost:8000/links/b056cd23-e02a-4abd-b4fd-65fa3861dfaf
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MjUyZjZmNS0xMWRjLTQ0NDgtYWE4YS0xNzNjNDkwODg1YzQiLCJleHAiOjE3ODQxNzc1MDl9.2llDYlRsz413ze2nXrglNo2e6_DFYtDfE6cU6qwxv1w
+DELETE http://localhost:8000/links/46fc896b-1664-4152-9c1e-e6a3d17033a5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzODc2OTVmYi1mNGNmLTRmZjAtYjQ5NS0wM2IwNjg2YzYwYTQiLCJleHAiOjE3ODQxODIzNDd9.32B1Bqsz4rmkkIr5k6TomqDSCuJkC6G4_Ny9APR4Kps
 Content-Type: application/json
 
 ### REDIRECT TEST

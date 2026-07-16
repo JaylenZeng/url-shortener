@@ -20,7 +20,7 @@ class User(Base):
     DateTime(timezone=True), server_default=func.now()
   )
   
-  links: Mapped[list["Link"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+  links: Mapped[list["Link"]] = relationship(back_populates="user")
 
 class Link(Base):
   __tablename__ = "links"
@@ -28,10 +28,10 @@ class Link(Base):
   id: Mapped[uuid.UUID] = mapped_column(
     UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
   )
-  short_code: Mapped[str] = mapped_column(String(16), unique=True, nullable=False)
+  short_code: Mapped[str] = mapped_column(String(16), nullable=False)
   original_url: Mapped[str] = mapped_column(String(2048), nullable=False)
   user_id: Mapped[uuid.UUID] = mapped_column(
-            UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+            UUID(as_uuid=True), ForeignKey("users.id"), index=True
   )
   created_at: Mapped[datetime] = mapped_column(
     DateTime(timezone=True), server_default=func.now()
@@ -42,7 +42,7 @@ class Link(Base):
   )
   
   user: Mapped["User"] = relationship(back_populates="links")
-  table_args__ = (
+  __table_args__ = (
     Index(
       "ix_links_short_code_active",
       "short_code",
