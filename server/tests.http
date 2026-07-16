@@ -1,0 +1,32 @@
+### Login
+POST http://localhost:8000/auth/login
+Content-Type: application/json
+
+{
+  "email": "jaylenzeng@gmail.com",
+  "password": "bkny11223"
+}
+
+### Create a short link
+POST http://localhost:8000/links
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMjUxNWFiYy1hNjcyLTRmNzAtYmE2NS00MjJjYjNiNzFhZjgiLCJleHAiOjE3ODQxODE2OTh9.KJqKUafOn_YMZxQx_5xEhUEpp2ov36P-iEfl-P90qCk
+Content-Type: application/json
+
+{
+  "original_url": "https://xmonader.github.io/nimdays/day07_shorturl.html",
+  "custom_alias": "typeshit"
+}
+
+### Get all of a user's links
+GET http://localhost:8000/links
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMjUxNWFiYy1hNjcyLTRmNzAtYmE2NS00MjJjYjNiNzFhZjgiLCJleHAiOjE3ODQxODE2OTh9.KJqKUafOn_YMZxQx_5xEhUEpp2ov36P-iEfl-P90qCk
+Content-Type: application/json
+
+### Delete a short link (soft delete)
+DELETE http://localhost:8000/links/b056cd23-e02a-4abd-b4fd-65fa3861dfaf
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1MjUyZjZmNS0xMWRjLTQ0NDgtYWE4YS0xNzNjNDkwODg1YzQiLCJleHAiOjE3ODQxNzc1MDl9.2llDYlRsz413ze2nXrglNo2e6_DFYtDfE6cU6qwxv1w
+Content-Type: application/json
+
+### REDIRECT TEST
+GET http://localhost:8000/typeshit
+Content-Type: application/json

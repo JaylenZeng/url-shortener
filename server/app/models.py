@@ -28,7 +28,7 @@ class Link(Base):
   id: Mapped[uuid.UUID] = mapped_column(
     UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
   )
-  short_code: Mapped[str] = mapped_column(String(16), unique=True, nullable=False, index=True)
+  short_code: Mapped[str] = mapped_column(String(16), unique=True, nullable=False)
   original_url: Mapped[str] = mapped_column(String(2048), nullable=False)
   user_id: Mapped[uuid.UUID] = mapped_column(
             UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
@@ -42,6 +42,14 @@ class Link(Base):
   )
   
   user: Mapped["User"] = relationship(back_populates="links")
+  table_args__ = (
+    Index(
+      "ix_links_short_code_active",
+      "short_code",
+      unique=True,
+      postgresql_where=(deleted_at.is_(None)),
+    ),
+  )
   
 class ClickEvent(Base):
   __tablename__ = "click_events"
