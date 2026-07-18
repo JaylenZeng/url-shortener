@@ -12,6 +12,7 @@ dependencies = [
     "fastapi>=0.139.0",
     "pydantic-settings>=2.14.2",
     "python-jose[cryptography]>=3.5.0",
+    "redis>=8.0.1",
     "sqlalchemy>=2.0.51",
     "uvicorn>=0.51.0",
 ]

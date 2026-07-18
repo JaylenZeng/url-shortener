@@ -2,11 +2,16 @@ import logging
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from app.exceptions import AliasTakenError, CodeGenerationError, LinkNotFoundError
+from app.exceptions import AliasTakenError, CodeGenerationError, LinkExpiredError, LinkNotFoundError
 
 logger = logging.getLogger(__name__)
 
 def register_error_handlers(app: FastAPI) -> None:
+  
+  @app.exception_handler(LinkExpiredError)
+  async def link_not_found_handler(request: Request, exc: LinkExpiredError):
+    return JSONResponse(status_code=410, content={"error": "Link not found", "status_code": 404})
+  
   
   @app.exception_handler(LinkNotFoundError)
   async def link_not_found_handler(request: Request, exc: LinkNotFoundError):

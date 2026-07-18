@@ -2,6 +2,7 @@ from datetime import datetime
 import secrets, string
 import uuid
 from pydantic import HttpUrl
+from redis import Redis
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -38,7 +39,7 @@ async def create_link_service(db: AsyncSession, user: User, original_url: HttpUr
       raise # not our concern, let it surface as a real error
   raise CodeGenerationError()
 
-async def delete_link_service(db: AsyncSession, user: User, link_id: uuid.UUID):
+async def delete_link_service(db: AsyncSession, user: User, link_id: uuid.UUID, r: Redis):
   link = await db.scalar(
     select(Link).where(
       Link.id == link_id,
@@ -50,6 +51,8 @@ async def delete_link_service(db: AsyncSession, user: User, link_id: uuid.UUID):
     raise LinkNotFoundError()
   link.deleted_at = func.now()
   await db.flush()
+  await r.delete(f"link:{link.short_code}")
+  
 
 async def get_active_link_by_code(db: AsyncSession, code: str) -> Link | None:
   return await db.scalar(
