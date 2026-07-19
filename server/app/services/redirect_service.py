@@ -1,5 +1,7 @@
 
 from datetime import datetime, timezone
+import json
+from typing import TypedDict
 
 from fastapi import Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
@@ -10,7 +12,11 @@ from app.db import get_db, get_redis
 from app.exceptions import LinkNotFoundError, LinkExpiredError
 from app.services.link_service import get_active_link_by_code
 
-async def fetch_link(code: str, r: Redis, db: AsyncSession):
+class LinkData(TypedDict):
+    url: str
+    link_id: str
+
+async def fetch_link(code: str, r: Redis, db: AsyncSession) -> LinkData:
   link = await get_active_link_by_code(db, code)
   
   # check if result is valid
@@ -25,10 +31,14 @@ async def fetch_link(code: str, r: Redis, db: AsyncSession):
   if link.expires_at:
       remaining = int((link.expires_at - datetime.now(timezone.utc)).total_seconds())
       ttl = min(ttl, remaining)
-  await r.set(f"link:{code}", link.original_url, ex=ttl)
-  return link.original_url
+  data = {
+    "url": link.original_url,
+    "link_id": str(link.id)
+  }
+  await r.set(f"link:{code}", json.dumps(data), ex=ttl)
+  return data
 
-async def resolve_url(code: str, r: Redis, db: AsyncSession) -> str:
+async def resolve_url(code: str, r: Redis, db: AsyncSession) -> LinkData:
   cached = await r.get(f"link:{code}")
   # cache hit!
   if cached == "__MISS__":
@@ -36,7 +46,7 @@ async def resolve_url(code: str, r: Redis, db: AsyncSession) -> str:
   if cached == "__EXPIRED__":
     raise LinkExpiredError()
   if cached:
-    return cached
+    return json.loads(cached)
 
   # cache miss...
   return await fetch_link(code, r, db)
