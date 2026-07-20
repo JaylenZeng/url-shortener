@@ -1,3 +1,48 @@
+# Day 6: Rate limiting
+- 
+
+# Day 4-5: Redis Pt 2 / ARQ
+- arq is an asyncio-native distributed job queue for Python that uses Redis as its message broker and state backend            
+- "Queueing decouples it: redirect enqueues a lightweight job and returns immediately. A separate worker process drains the queue and does the DB writes. Redirect stays sub-ms; analytics writes happen off to the side, can lag, can batch, can absorb bursts."
+- Pieces of the puzzle:
+  - Producer: Enqueues the payload for the worker to process (in the route)
+  - Queue: Redis-backed via arq
+  - Worker: separate process (see worker.py) and arq entry point. Consumes jobs and in this case writes to click_events
+  - Table: click_events (link_id FK, clicked_at, user_agent, referrer, ip)
+- Worker is a separate process so it can't use FastAPI's dependency injection. We create another engine/sessionmaker for the Worker and add it to its ctx (context) map.
+- WorkerSettings include list of task functions, lifecycle hooks (on_startup/on_shutdown), and redis configuration settings.
+- Don't pass rich objects (Pydantic models, ORM instances, datetimes) straight into a job queue. Serialize to plain JSON types on the producers side (via model_dump(mode="json")), enqueue the dict, then reconstruct and validate on the worker.
+  - Serializer-agnostic: a dict survives any backend cleanly
+  - Explicit trust boundary: revalidating on the worker means a malformed payload fails loudly at the edge
+  - Type honesty: what crosses the wire is a dict; the worker's signature should say dict, then validate up to the real type.
+- The queue is like a network boundary. The producer and worker are separate processes.
+- You can implement idempotency by also enqueuing a stable unique id. On retry, the queue will reuse the same job + same ID which the insert can detect. In this project, I used on_conflict_do_nothing from postgres so the second unintended repeat passes without affecting anything.
+
+# Day 3: Caching / Redis
+- Redis is an in-memory key-value store. 
+  - Data lives in RAM -> sub-millisecond reads (fast!).
+  - Single-threaded, so commands execute atomically (atomicity means that an operation or a group of commands executes as a single, indivisible unit of work)
+    - this also means no other client commands can interupt or run in the middle of it. It either completes or nothing happens meaning corrupted states are not possible.
+  - Persists to disk optionally (RDB snapshots / AOF log)
+  - For this project, I am using Redis as an ephemeral cache.
+```
+GET / SET key value — cache-aside for redirects
+SET key value EX 3600 — TTL in seconds
+DEL key — cache invalidation on update/delete
+INCR + EXPIRE — rate limiting counters
+List/stream ops — arq queue backing (handled by library)
+```
+- **Cache-Aside Pattern** (lazy-loading): Strategy for managing data caching to enhance system performance. 
+  - When an application needs data, it first checks the cache.
+    - If data is found (cache hit!), it's used directly.
+    - If not found (cache miss...), application retrieves it from the main database and stores a copy in the cache for future use.
+  - This pattern reduces database load, speeds up data access, and is widely used to improve the efficiency and scalability of applications by ensuring frequently accessed data is quickly available. 
+
+- **Cache Eviction policy**: Since cache storage is limited, an eviction policy (such as Least Recently Used - LRU) is necessary to remove old or less frequently used data.
+- **Data Consistency and Expiry**: Strategies must be in place to maintain data consistency between the cache and the database. This can include setting expiry times on cached data to ensure it is periodically refreshed or using cache invalidation techniques when data in the database changes.
+- You should still cache negative results because if an attacker sends 10k requests/sec, they will all land on the DB. (CACHE PENETRATION).
+- There is a risk of an original url being "__MISS__" or "__EXPIRED__". Since this is practically impossible, I stuck with raw sentinels. However, do note that the risk exists. I accepted the risk because the tradeoff meant doing 2 GETs and adding complexity where it wasn't needed.
+
 # Day 2: Routing 
 - Make sure to handle all possible errors. For example, an IntegrityError can be a null violation, FK violation, or anything hitting a constraint. A precise version inspects the constraint name on the error: `constraint = getattr(getattr(e.orig, "__cause__", None), "constraint_name", None)`
 - Be careful when committing within a service. For a Transaction that requires multiple writes, you wil encounter problems. If you commit in create_link, but want to log an audit row, you won't be able to roll back both together in the event that something goes wrong

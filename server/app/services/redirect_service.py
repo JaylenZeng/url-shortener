@@ -3,12 +3,9 @@ from datetime import datetime, timezone
 import json
 from typing import TypedDict
 
-from fastapi import Depends, HTTPException, status
-from fastapi.responses import RedirectResponse
 from redis import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_db, get_redis
 from app.exceptions import LinkNotFoundError, LinkExpiredError
 from app.services.link_service import get_active_link_by_code
 

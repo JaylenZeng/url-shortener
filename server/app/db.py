@@ -25,5 +25,16 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
       await session.rollback()
       raise
 
+async def init_arq_pool():
+  global _arq_pool
+  _arq_pool = await create_pool(RedisSettings.from_dsn(settings.redis_url))
+
+async def close_arq_pool():
+  global _arq_pool
+  if _arq_pool:
+    await _arq_pool.close()
+
 async def get_arq():
+  if _arq_pool is None:
+    raise RuntimeError("arq pool not initialized - check lifespan startup")
   return _arq_pool

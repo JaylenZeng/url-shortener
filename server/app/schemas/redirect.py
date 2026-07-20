@@ -1,9 +1,10 @@
-from pydantic import BaseModel, ConfigDict, HttpUrl, Field
+from pydantic import BaseModel, Field
 from datetime import datetime
 import uuid
 
 class ClickEventPayload(BaseModel):
   link_id: uuid.UUID
+  event_id: uuid.UUID
   clicked_at: datetime
   user_agent: str | None = Field(default=None, max_length=512) 
   referrer: str | None = Field(default=None, max_length=2048)

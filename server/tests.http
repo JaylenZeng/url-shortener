@@ -18,12 +18,12 @@ Content-Type: application/json
 
 ### Create a short link
 POST http://localhost:8000/links
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMjUxNWFiYy1hNjcyLTRmNzAtYmE2NS00MjJjYjNiNzFhZjgiLCJleHAiOjE3ODQxODE2OTh9.KJqKUafOn_YMZxQx_5xEhUEpp2ov36P-iEfl-P90qCk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZTIwMzg4OC03YzQ3LTRjYWUtOWRjZi0yYjQ3YjkzNDE1ZDQiLCJleHAiOjE3ODQ1MDgwOTF9._aVrvyhhDf4zTKZ3sMGdfpUen1r1GPzb48vBPdwkp-4
 Content-Type: application/json
 
 {
-  "original_url": "https://xmonader.github.io/nimdays/day07_shorturl.html",
-  "custom_alias": "typeshit"
+  "original_url": "https://x.com/home",
+  "custom_alias": "hello"
 }
 
 ### Get all of a user's links
