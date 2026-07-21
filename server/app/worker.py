@@ -1,3 +1,5 @@
+import structlog
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from app.core.config import settings
@@ -5,12 +7,21 @@ from arq.connections import RedisSettings
 
 from app.models import ClickEvent
 from app.schemas.redirect import ClickEventPayload
+from app.core.logging import log
 
 engine = create_async_engine(settings.database_url, echo=False)
 SessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 async def record_click(ctx, raw: dict):
+  # setup payload
   payload = ClickEventPayload.model_validate(raw)
+  
+  # structlog 
+  structlog.contextvars.clear_contextvars()
+  structlog.contextvars.bind_contextvars(request_id=payload.request_id)
+  log = structlog.get_logger()
+  log.info("processing_click", link_id=str(payload.link_id), event_id=str(payload.event_id))
+  
   stmt = pg_insert(ClickEvent).values(
     link_id=payload.link_id,
     event_id=payload.event_id,
@@ -34,6 +45,7 @@ async def record_click(ctx, raw: dict):
   
 async def startup(ctx):
   ctx["db"] = SessionLocal
+  
 
 async def shutdown(ctx):
   await engine.dispose()

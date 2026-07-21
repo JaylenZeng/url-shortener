@@ -16,6 +16,7 @@ dependencies = [
     "redis>=8.0.1",
     "slowapi>=0.1.10",
     "sqlalchemy>=2.0.51",
+    "structlog>=26.1.0",
     "uvicorn>=0.51.0",
 ]
 

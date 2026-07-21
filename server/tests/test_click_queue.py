@@ -60,6 +60,9 @@ async def test_enqueued_payload_shape(client: AsyncClient, user, spy_arq):
     assert isinstance(payload["event_id"], str)
     # event_id is a valid uuid string
     uuid.UUID(payload["event_id"])
+    # same tests for request_id
+    assert isinstance(payload["request_id"], str)
+    uuid.UUID(payload["request_id"])  # valid uuid string
     # clicked_at is an ISO string, not a datetime object
     assert isinstance(payload["clicked_at"], str)
     datetime.fromisoformat(payload["clicked_at"])  # parses -> valid ISO

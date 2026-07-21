@@ -6,8 +6,10 @@ from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
 
 from app.core.db import close_arq_pool, init_arq_pool
+from app.middleware.logging_middleware import RequestIDMiddleware
 from app.routes import auth_router, links_router, redirect_router
 from app.core.error_handlers import register_error_handlers
+from app.core.logging import log
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,6 +23,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 register_error_handlers(app)
+app.add_middleware(RequestIDMiddleware)
 
 app.include_router(auth_router)
 app.include_router(links_router)

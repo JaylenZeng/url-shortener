@@ -46,6 +46,7 @@ def _payload(link_id, event_id):
     return {
         "link_id": str(link_id),
         "event_id": str(event_id),
+        "request_id": str(uuid.uuid4()),
         "clicked_at": datetime.now(timezone.utc).isoformat(),
         "user_agent": "test",
         "referrer": None,
@@ -132,3 +133,17 @@ async def test_create_link_rate_limited_per_user(client, user):
         )
         statuses.append(r.status_code)
     assert 429 in statuses
+
+# ---- request_id middleware ----------------------------------------------------------
+async def test_request_id_propagates_to_payload(client, user, spy_arq):
+    """request_id bound per-request flows into the enqueued job,
+    so web + worker logs correlate."""
+    await client.post(
+        "/links",
+        json={"original_url": "https://target.com", "custom_alias": "rid"},
+        headers=auth_header(user),
+    )
+    await client.get("/rid", follow_redirects=False)
+
+    _, args, _ = spy_arq.jobs[0]
+    assert args[0]["request_id"]  # present + non-empty

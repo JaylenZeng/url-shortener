@@ -1,4 +1,5 @@
-import logging
+import structlog
+from structlog.contextvars import get_contextvars
 import uuid
 
 from arq import ArqRedis
@@ -11,9 +12,10 @@ from app.schemas.redirect import ClickEventPayload
 from app.services.redirect_service import LinkData, resolve_url
 from datetime import datetime, timezone
 from app.core.limiter import limiter
+from structlog.contextvars import get_contextvars
 
 router = APIRouter(tags=["redirect"])
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()  
 
 # Redirects person who clicked on link to original URL
 @router.get("/{code}")
@@ -26,18 +28,20 @@ async def redirect_link(
   ):
   data: LinkData = await resolve_url(code, r, db)
   this_event_id = uuid.uuid4()
+  rid = get_contextvars().get("request_id")
   try:
     payload = ClickEventPayload(
       link_id=data["link_id"],
       event_id=this_event_id,
+      request_id=rid,
       clicked_at=datetime.now(timezone.utc),
       user_agent=request.headers.get("user-agent"),
       referrer=request.headers.get("referer"),
       ip=request.client.host,
     )
     await arq.enqueue_job("record_click", payload.model_dump(mode="json"))
+    logger.info("click_enqueued", code=code, event_id=str(this_event_id))
   except Exception:
-    # TODO: structlog.warning("click enqueue failed", code=code)
-    logger.warning("click enqueue failed for code %s", code)
+    logger.warning("click_enqueue_failed", code=code, exc_info=True)
   return RedirectResponse(url=data["url"], status_code=307)
 
