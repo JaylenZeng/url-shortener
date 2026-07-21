@@ -1,5 +1,5 @@
 """
-Pure unit tests — no database, no HTTP. Fast, deterministic.
+Pure unit tests (no database, no HTTP).
 Covers: short-code generation, password hashing, JWT creation/decoding.
 """
 import uuid
@@ -7,7 +7,7 @@ import uuid
 import pytest
 from jose import jwt
 
-from app.config import settings
+from app.core.config import settings
 from app.services.auth_service import (
     create_access_token,
     hash_password,

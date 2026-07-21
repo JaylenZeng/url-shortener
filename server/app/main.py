@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from app.limiter import limiter
+from app.core.limiter import limiter
 
-from app.db import close_arq_pool, init_arq_pool
+from app.core.db import close_arq_pool, init_arq_pool
 from app.routes import auth_router, links_router, redirect_router
-from app.errors import register_error_handlers
+from app.core.error_handlers import register_error_handlers
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

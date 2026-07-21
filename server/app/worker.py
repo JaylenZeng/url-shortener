@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from app.config import settings
+from app.core.config import settings
 from arq.connections import RedisSettings
 
 from app.models import ClickEvent

@@ -2,7 +2,7 @@ import logging
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from app.exceptions import AliasTakenError, CodeGenerationError, LinkExpiredError, LinkNotFoundError
+from app.core.exceptions import AliasTakenError, CodeGenerationError, LinkExpiredError, LinkNotFoundError
 
 logger = logging.getLogger(__name__)
 

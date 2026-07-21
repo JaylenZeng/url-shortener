@@ -15,16 +15,16 @@ Run:
 """
 import os
 from typing import AsyncGenerator
-import uuid
 
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
+import fakeredis.aioredis
+ 
 from app.main import app
-from app.db import get_db
+from app.core.db import get_db, get_redis, get_arq
 from app.models import Base, User
 from app.services.auth_service import hash_password, create_access_token
 
@@ -103,3 +103,53 @@ def auth_header(u: User) -> dict[str, str]:
     """Bearer header for a given user."""
     token = create_access_token(str(u.id))
     return {"Authorization": f"Bearer {token}"}
+
+# ---- fake Redis -------------------------------------------------------------
+ 
+@pytest_asyncio.fixture
+async def fake_redis() -> AsyncGenerator["fakeredis.aioredis.FakeRedis", None]:
+    """In-process Redis. decode_responses=True to match the real client, so
+    cached values come back as str (your sentinels + json.loads rely on this)."""
+    r = fakeredis.aioredis.FakeRedis(decode_responses=True)
+    await r.flushall()
+    yield r
+    await r.flushall()
+    await r.aclose()
+ 
+ 
+# ---- spy arq pool -----------------------------------------------------------
+ 
+class SpyArq:
+    """Stand-in for the arq pool. Records enqueue_job calls instead of queueing.
+ 
+    Tests assert on `.jobs` to prove the redirect enqueued a click without
+    needing a live Redis queue or a worker process.
+    """
+    def __init__(self):
+        self.jobs: list[tuple[str, tuple, dict]] = []
+        self.fail = False  # flip to simulate an enqueue failure
+ 
+    async def enqueue_job(self, name, *args, **kwargs):
+        if self.fail:
+            raise RuntimeError("simulated enqueue failure")
+        self.jobs.append((name, args, kwargs))
+        return object()  # arq returns a Job; identity is all we need
+ 
+ 
+@pytest_asyncio.fixture
+async def spy_arq() -> AsyncGenerator[SpyArq, None]:
+    yield SpyArq()
+ 
+ 
+# ---- wire the overrides -----------------------------------------------------
+ 
+@pytest_asyncio.fixture(autouse=True)
+async def _override_redis_and_arq(fake_redis, spy_arq):
+    """Point the app's get_redis / get_arq at the fakes for every Week 2 test.
+    autouse so the redirect route always gets them; harmless for Week 1 tests
+    (they simply don't hit these dependencies)."""
+    app.dependency_overrides[get_redis] = lambda: fake_redis
+    app.dependency_overrides[get_arq] = lambda: spy_arq
+    yield
+    app.dependency_overrides.pop(get_redis, None)
+    app.dependency_overrides.pop(get_arq, None)

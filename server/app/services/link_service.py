@@ -7,8 +7,8 @@ from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Link, User
-from app.exceptions import AliasTakenError, CodeGenerationError
-from app.exceptions import LinkNotFoundError
+from app.core.exceptions import AliasTakenError, CodeGenerationError
+from app.core.exceptions import LinkNotFoundError
 
 ALPHABET = string.ascii_letters + string.digits
 

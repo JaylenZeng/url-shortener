@@ -1,7 +1,7 @@
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from app.config import settings
+from app.core.config import settings
 from redis import Redis
 from arq import create_pool
 from arq.connections import RedisSettings

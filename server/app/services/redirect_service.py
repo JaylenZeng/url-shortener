@@ -6,9 +6,9 @@ from typing import TypedDict
 from redis import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions import LinkNotFoundError, LinkExpiredError
+from app.core.exceptions import LinkNotFoundError, LinkExpiredError
 from app.services.link_service import get_active_link_by_code
-from app.config import settings
+from app.core.config import settings
 
 class LinkData(TypedDict):
     url: str

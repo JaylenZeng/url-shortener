@@ -1,7 +1,7 @@
 """
 Integration tests for link CRUD and the public redirect.
 
-Covers the Week 1 deliverable checks and success criteria:
+Covers the following success criteria:
   - create link (random + custom alias)
   - custom-alias collision -> 409
   - reuse of a SOFT-DELETED alias -> allowed (partial unique index)

@@ -2,7 +2,7 @@ from jose import jwt, JWTError
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from app.config import settings
+from app.core.config import settings
 
 def user_or_ip_key(request: Request) -> str:
   auth = request.headers.get("authorization", "")

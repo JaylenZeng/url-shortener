@@ -3,7 +3,7 @@ import asyncio, uuid
 from datetime import datetime, timezone
 from arq import create_pool
 from arq.connections import RedisSettings
-from app.config import settings
+from app.core.config import settings
 
 async def main():
     pool = await create_pool(RedisSettings.from_dsn(settings.redis_url))
