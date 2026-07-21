@@ -10,12 +10,14 @@ from app.db import get_arq, get_db, get_redis
 from app.schemas.redirect import ClickEventPayload
 from app.services.redirect_service import LinkData, resolve_url
 from datetime import datetime, timezone
+from app.limiter import limiter
 
 router = APIRouter(tags=["redirect"])
 logger = logging.getLogger(__name__)
 
 # Redirects person who clicked on link to original URL
 @router.get("/{code}")
+@limiter.limit("100/minute")
 async def redirect_link(
     code: str, request: Request, 
     r: Redis = Depends(get_redis), 
