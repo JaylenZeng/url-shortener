@@ -1,5 +1,16 @@
+# Day 7:
+- Use locust to load test server with and without cache. Results below:
+![With Cache](/assets/with-cache.png)
+![Without Cache](/assets/without-cache.png)
+- Index Only Scans are only used when the index is actually cheaper. Postgres still uses Seq scan if a majority of the table matches the predicate.
+
 # Day 6: Rate limiting
-- 
+- We can use SlowAPI library in Python to implement rate limiting. FastAPI does not come with rate limiting by default!
+- SlowAPI uses fixed window algorithm by default. 3 approaches for rate limiting:
+  - **Fixed Window:** count per time-aligned window (like per minute). FLAW: weakness on the edges. 100 requests at 0:59 + 100 requests at 1:00 = 200 requests in 2 seconds
+  - **Sliding Window:** rolling time span which smoothes out the edge weaknesses. More accurate, but also more Redis work.
+  - **Token bucket:** tokens refill at a rate, each request spends one. Allows controlled bursts and is common in APIs.
+- With the way I implemented Auth, our limiter can't easily see the get_user dependency. The fix is a custom key function that pulls the user from the Request header directly.
 
 # Day 4-5: Redis Pt 2 / ARQ
 - arq is an asyncio-native distributed job queue for Python that uses Redis as its message broker and state backend            
@@ -17,6 +28,10 @@
   - Type honesty: what crosses the wire is a dict; the worker's signature should say dict, then validate up to the real type.
 - The queue is like a network boundary. The producer and worker are separate processes.
 - You can implement idempotency by also enqueuing a stable unique id. On retry, the queue will reuse the same job + same ID which the insert can detect. In this project, I used on_conflict_do_nothing from postgres so the second unintended repeat passes without affecting anything.
+- For this project, losing a few enqueued events if Redis restarts is acceptable. To prevent it though, we could:
+  - Turn on Redis AOF with `appendfsync everysec`
+  - Don't use Redis and instead use a broker with durability guarantees (e.g. a real message queue with acks + persistent storage)
+  - write click events to a durable store first, process async second (defeats some of the latency benefit)
 
 # Day 3: Caching / Redis
 - Redis is an in-memory key-value store. 

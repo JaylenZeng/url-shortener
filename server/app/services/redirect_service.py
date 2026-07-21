@@ -8,10 +8,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import LinkNotFoundError, LinkExpiredError
 from app.services.link_service import get_active_link_by_code
+from app.config import settings
 
 class LinkData(TypedDict):
     url: str
     link_id: str
+
+async def _load_link(code: str, db: AsyncSession):
+    """DB lookup + validation. No cache. Returns Link or raises."""
+    link = await get_active_link_by_code(db, code)
+    if link is None:
+        raise LinkNotFoundError()
+    if link.expires_at is not None and link.expires_at < datetime.now(timezone.utc):
+        raise LinkExpiredError()
+    return link
+
+
+async def fetch_link_uncached(code: str, db: AsyncSession) -> LinkData:
+    """Benchmark path: DB only, no Redis at all."""
+    link = await _load_link(code, db)
+    return {"url": link.original_url, "link_id": str(link.id)}
 
 async def fetch_link(code: str, r: Redis, db: AsyncSession) -> LinkData:
   link = await get_active_link_by_code(db, code)
@@ -36,6 +52,10 @@ async def fetch_link(code: str, r: Redis, db: AsyncSession) -> LinkData:
   return data
 
 async def resolve_url(code: str, r: Redis, db: AsyncSession) -> LinkData:
+  # benchmark bypass: pure DB path, no Redis read or write
+  if not settings.cache_enabled:
+    return await fetch_link_uncached(code, db)
+  
   cached = await r.get(f"link:{code}")
   # cache hit!
   if cached == "__MISS__":

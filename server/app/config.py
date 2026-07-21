@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 60
     env: str = "development"
 
+    cache_enabled: bool = True
     model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 # Redirects person who clicked on link to original URL
 @router.get("/{code}")
-@limiter.limit("100/minute")
+@limiter.limit("1000000/minute")
 async def redirect_link(
     code: str, request: Request, 
     r: Redis = Depends(get_redis), 

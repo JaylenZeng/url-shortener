@@ -14,7 +14,7 @@ router = APIRouter(prefix="/links", tags=["links"])
 
 # Create a link
 @router.post("", status_code=201, response_model=LinkResponse)
-@limiter.limit("10/minute", key_func=user_or_ip_key)
+@limiter.limit("1000000/minute", key_func=user_or_ip_key)
 async def create_link(body: CreateLinkRequest, request: Request, db: AsyncSession = Depends(get_db), curr_user: User = Depends(get_current_user)) -> Link:
   link = await create_link_service(db, curr_user, body.original_url, body.custom_alias, body.expires_at)
   return link

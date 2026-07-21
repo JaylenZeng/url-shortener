@@ -3,7 +3,7 @@ POST http://localhost:8000/auth/register
 Content-Type: application/json
 
 {
-  "email": "test@gmail.com",
+  "email": "test2@gmail.com",
   "password": "abc123456"
 }
 
@@ -12,18 +12,17 @@ POST http://localhost:8000/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@gmail.com",
+  "email": "test2@gmail.com",
   "password": "abc123456"
 }
 
 ### Create a short link
 POST http://localhost:8000/links
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZTIwMzg4OC03YzQ3LTRjYWUtOWRjZi0yYjQ3YjkzNDE1ZDQiLCJleHAiOjE3ODQ1MDgwOTF9._aVrvyhhDf4zTKZ3sMGdfpUen1r1GPzb48vBPdwkp-4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZTIwMzg4OC03YzQ3LTRjYWUtOWRjZi0yYjQ3YjkzNDE1ZDQiLCJleHAiOjE3ODQ2NTI4MzZ9.0Utb4mUWyzwLviugP9XcIYsHvbA9ZKSheUQJwNb_NmY
 Content-Type: application/json
 
 {
-  "original_url": "https://x.com/home",
-  "custom_alias": "hello"
+  "original_url": "https://x.com/home"
 }
 
 ### Get all of a user's links
