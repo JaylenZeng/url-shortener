@@ -1,8 +1,13 @@
-# Day 7:
+# Day 7: Wrapping Up
 - Use locust to load test server with and without cache. Results below:
 ![With Cache](/assets/with-cache.png)
 ![Without Cache](/assets/without-cache.png)
 - Index Only Scans are only used when the index is actually cheaper. Postgres still uses Seq scan if a majority of the table matches the predicate.
+- Structured logging converts logs into queryable datasets making for easier parsing and automatically triggering alerts.
+- Structlog can also attach consistent fields like a request_id to correlate a single transaction across multiple distributed microservices.
+- Python has a built-in tool called **contextvar** which is a global variable scoped per-async-task. This makes it so we don't have to pass in a parameter through every layer.
+  - structlog builds on this with: `structlog.contextvars.bind_contextvars(request_id=...)`
+
 
 # Day 6: Rate limiting
 - We can use SlowAPI library in Python to implement rate limiting. FastAPI does not come with rate limiting by default!
