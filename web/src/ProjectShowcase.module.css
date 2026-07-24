@@ -1,0 +1,64 @@
+.wrapper {
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.carousel,
+.viewport,
+.container,
+.slide {
+  height: 100%;
+}
+
+.slideInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 28px;
+  box-sizing: border-box;
+}
+
+.media {
+  flex: 1;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.mediaLabel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+.text {
+  padding: 28px 4px 44px;
+}
+
+/* Reposition Mantine's indicator dots to sit just under the text, centered. */
+.indicators {
+  bottom: 20px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.35);
+  transition:
+    width 200ms ease,
+    background-color 200ms ease;
+}
+
+.indicator[data-active] {
+  width: 22px;
+  background-color: #ffffff;
+}

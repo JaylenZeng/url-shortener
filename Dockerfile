@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- build stage ----
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 # uv: fast dependency install
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -9,19 +9,19 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 # cache deps separately from source
-COPY pyproject.toml uv.lock ./
+COPY server/pyproject.toml server/uv.lock ./
 
 # install into a self-contained venv at /app/.venv
 ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-dev
 
-COPY . .
+COPY server/ .
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # ---- runtime stage ----
-FROM python:3.12-slim AS runtime
+FROM python:3.13-slim AS runtime
 
 # non-root user
 RUN useradd -m -u 1000 appuser

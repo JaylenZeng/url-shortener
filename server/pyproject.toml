@@ -11,6 +11,7 @@ dependencies = [
     "bcrypt>=5.0.0",
     "email-validator>=2.3.0",
     "fastapi>=0.139.0",
+    "gunicorn>=26.0.0",
     "pydantic-settings>=2.14.2",
     "python-jose[cryptography]>=3.5.0",
     "redis>=8.0.1",

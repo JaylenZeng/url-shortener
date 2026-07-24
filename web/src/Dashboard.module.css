@@ -1,0 +1,46 @@
+.page {
+  min-height: 100vh;
+  background-color: #f6f7f9;
+  padding: 48px 24px;
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8a3d, #f5651a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.tableCard {
+  background-color: #ffffff;
+  border: 1px solid #eceef1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.empty {
+  background-color: #ffffff;
+  border: 1px solid #eceef1;
+  border-radius: 16px;
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+@media (max-width: 48em) {
+  .page {
+    padding: 24px 12px;
+  }
+}

@@ -1,13 +1,21 @@
+# VCS
 .git
 .gitignore
-.venv
-__pycache__
-*.pyc
-.pytest_cache
-.mypy_cache
-.ruff_cache
-.env
+
+# Repo files not copied into the image
 *.md
-tests/
 docker-compose.yml
 Dockerfile
+.dockerignore
+
+# Python / uv artifacts inside the server package
+server/.venv
+server/**/__pycache__
+server/**/*.pyc
+server/.pytest_cache
+server/.mypy_cache
+server/.ruff_cache
+
+# Secrets & tests
+server/.env
+server/tests/

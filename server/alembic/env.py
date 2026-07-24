@@ -1,5 +1,6 @@
 # server/alembic/env.py
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -7,13 +8,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from app.core.config import settings
 from app.models import Base   # your SQLAlchemy declarative base
 
 config = context.config
 
 # Inject DATABASE_URL from your .env instead of alembic.ini
-config.set_main_option("sqlalchemy.url", settings.database_url)
+config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
