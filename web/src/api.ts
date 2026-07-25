@@ -127,6 +127,34 @@ export function deleteLink(id: string): Promise<void> {
   return request<void>(`/links/${id}`, { method: "DELETE", auth: true });
 }
 
+export interface DailyClicks {
+  date: string;
+  clicks: number;
+}
+
+export interface ReferrerCount {
+  referrer: string | null;
+  clicks: number;
+}
+
+export interface UserAgentCount {
+  user_agent: string | null;
+  clicks: number;
+}
+
+export interface LinkStats {
+  link_id: string;
+  short_code: string;
+  total_clicks: number;
+  clicks_by_day: DailyClicks[];
+  top_referrers: ReferrerCount[];
+  top_user_agents: UserAgentCount[];
+}
+
+export function getLinkStats(id: string): Promise<LinkStats> {
+  return request<LinkStats>(`/links/${id}/stats`, { auth: true });
+}
+
 // Base origin that serves the short links / redirects. In dev the redirect
 // route lives on the backend (port 8000), so point there; in production the
 // short links are served from the same origin as the app.

@@ -7,9 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.limiter import limiter, user_or_ip_key
 from app.core.db import get_db, get_redis
 from app.models import ClickEvent, Link, User
-from app.schemas.links import CreateLinkRequest, LinkResponse
+from app.schemas.links import CreateLinkRequest, LinkResponse, LinkStatsResponse
 from app.services.auth_service import get_current_user
-from app.services.link_service import create_link_service, delete_link_service
+from app.services.link_service import (
+  create_link_service,
+  delete_link_service,
+  get_link_stats_service,
+)
 
 router = APIRouter(prefix="/links", tags=["links"])
 
@@ -46,6 +50,15 @@ async def list_links(db: AsyncSession = Depends(get_db), user=Depends(get_curren
     )
     for link, count in rows.all()
   ]
+
+# Analytics for a single link: clicks by day, top referrers, top user agents.
+@router.get("/{link_id}/stats", status_code=200, response_model=LinkStatsResponse)
+async def link_stats(
+  link_id: uuid.UUID,
+  db: AsyncSession = Depends(get_db),
+  curr_user: User = Depends(get_current_user),
+) -> LinkStatsResponse:
+  return await get_link_stats_service(db, curr_user, link_id)
 
 # Delete a user's links
 @router.delete("/{link_id}", status_code=204)

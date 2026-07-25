@@ -1,0 +1,197 @@
+/* Small decorative visuals shown in each carousel slide's media area.
+   Colors follow the dataviz dark palette, validated against the #1b1f28 card
+   surface (categorical trio blue/orange/aqua, single-series slot-1 blue). */
+.root {
+  --card: #272c37;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --ring: rgba(255, 255, 255, 0.1);
+  --grid: #2c2c2a;
+  --series: #3987e5;
+  --good: #0ca30c;
+
+  height: 100%;
+  display: flex;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--ring);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.value {
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.big {
+  font-size: 34px;
+}
+
+.mid {
+  font-size: 26px;
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--good);
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* --- bar sparkline / histogram --- */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 46px;
+  margin-top: 12px;
+}
+
+.bar {
+  flex: 1;
+  background: var(--series);
+  border-radius: 3px 3px 0 0;
+  min-height: 3px;
+}
+
+/* Analytics accent: the modal's clicks-by-day bars are orange with 4px tops. */
+.overviewBar {
+  background: #f5651a;
+  border-radius: 4px 4px 0 0;
+}
+
+.subLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+/* --- ranked horizontal bars (top referrers) — mirrors the analytics modal --- */
+.ranked {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.rankTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.rankName {
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankNameMuted {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.rankVal {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+.rankTrack {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--grid);
+  overflow: hidden;
+}
+
+.rankFill {
+  height: 100%;
+  border-radius: 4px;
+  background: #f5651a;
+}
+
+/* --- progress meter --- */
+.meterTrack {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--grid);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--series);
+}
+
+/* --- architecture diagram --- */
+.diagram {
+  width: 100%;
+  height: auto;
+}
+
+.nodeBox {
+  fill: #21252f;
+  stroke: var(--ring);
+  stroke-width: 1;
+}
+
+.nodeName {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.nodeSub {
+  fill: var(--muted);
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.edge {
+  stroke: #4a5060;
+  stroke-width: 1.5;
+  fill: none;
+}

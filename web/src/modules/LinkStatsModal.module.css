@@ -1,0 +1,75 @@
+.code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #f5651a;
+}
+
+.hero {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: #1a1a1a;
+}
+
+/* Clicks-by-day: evenly spaced vertical bars sharing one scale. */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 140px;
+}
+
+.barCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  cursor: default;
+}
+
+.barTrack {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar {
+  width: 100%;
+  max-width: 40px;
+  background-color: #f5651a;
+  border-radius: 4px 4px 0 0;
+  transition: background-color 120ms ease;
+}
+
+.barCol:hover .bar {
+  background-color: #e0550c;
+}
+
+.barTick {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #868e96;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Ranked horizontal bars for referrers / user agents. */
+.rankTrack {
+  height: 8px;
+  width: 100%;
+  background-color: #f1f3f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rankFill {
+  height: 100%;
+  min-width: 4px;
+  background-color: #f5651a;
+  border-radius: 4px;
+}

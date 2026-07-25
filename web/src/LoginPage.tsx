@@ -19,26 +19,12 @@ import {
   type TokenResponse,
 } from "./api";
 import ProjectShowcase from "./ProjectShowcase";
-import classes from "./LoginPage.module.css";
+import classes from "./modules/LoginPage.module.css";
 
 function Logo() {
   return (
     <div className={classes.logo}>
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07"
-          stroke="currentColor"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
-      </svg>
+      <img className={classes.logoImg} src="/url_logo.svg" alt="URL Shorty logo" />
     </div>
   );
 }
@@ -113,7 +99,7 @@ export default function LoginPage({ onAuthenticated }: LoginPageProps) {
             <Logo />
 
             <Title order={2} ta="center" fw={700} c="#1a1a1a">
-              {isRegister ? "Create your Cusana account" : "Welcome Back to Cusana"}
+              {isRegister ? "Create your account" : "Welcome Back"}
             </Title>
             <Text ta="center" c="dimmed" size="sm" mt={6} mb="xl">
               {isRegister
@@ -161,10 +147,10 @@ export default function LoginPage({ onAuthenticated }: LoginPageProps) {
 
               {!isRegister && (
                 <Group justify="space-between" align="center">
-                  <Checkbox label="Remember me" size="sm" color="dark" />
-                  <Anchor href="#" size="sm" fw={600} c="#1a1a1a">
+                  {/* <Checkbox label="Remember me" size="sm" color="dark" /> */}
+                  {/* <Anchor href="#" size="sm" fw={600} c="#1a1a1a">
                     Forgot password
-                  </Anchor>
+                  </Anchor> */}
                 </Group>
               )}
 
@@ -215,15 +201,15 @@ export default function LoginPage({ onAuthenticated }: LoginPageProps) {
 
         <div className={classes.footer}>
           <Text size="xs" c="dimmed">
-            © 2024 Cusana inc. All rights reserved.
+            © 2026 Jaylen Zeng. All rights reserved.
           </Text>
           <Group gap="lg">
-            <Anchor href="#" size="xs" c="#1a1a1a">
+            {/* <Anchor href="#" size="xs" c="#1a1a1a">
               Privacy Policy
             </Anchor>
             <Anchor href="#" size="xs" c="#1a1a1a">
               Term &amp; Condition
-            </Anchor>
+            </Anchor> */}
           </Group>
         </div>
       </div>

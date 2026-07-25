@@ -19,6 +19,17 @@
   align-items: center;
   justify-content: center;
   color: #ffffff;
+  overflow: hidden;
+}
+
+.logoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.row {
+  cursor: pointer;
 }
 
 .tableCard {

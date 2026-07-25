@@ -2,7 +2,8 @@ import { useRef } from "react";
 import { Carousel } from "@mantine/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Text, Title } from "@mantine/core";
-import classes from "./ProjectShowcase.module.css";
+import SlideVisual, { type SlideVariant } from "./SlideVisual";
+import classes from "./modules/ProjectShowcase.module.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Edit this array to control the slideshow. Each entry is one slide.
@@ -17,6 +18,7 @@ interface Slide {
   bg: string;
   label: string; // small tag shown on the placeholder
   image?: string; // optional: path under public/, e.g. "/slides/dashboard.png"
+  variant: SlideVariant;
 }
 
 const SLIDES: Slide[] = [
@@ -26,6 +28,7 @@ const SLIDES: Slide[] = [
       "A full-stack URL shortener with click analytics — shorten any link and track how it performs in real time.",
     label: "Overview",
     bg: "linear-gradient(135deg, #f5651a 0%, #b23907 100%)",
+    variant: "overview"
   },
   {
     title: "Blazing-fast redirects",
@@ -33,6 +36,7 @@ const SLIDES: Slide[] = [
       "Async FastAPI with Redis-cached lookups serves redirects in single-digit milliseconds, cache miss or hit.",
     label: "Performance",
     bg: "linear-gradient(135deg, #1f6feb 0%, #0a2a66 100%)",
+    variant: "speed"
   },
   {
     title: "Built to scale",
@@ -40,6 +44,7 @@ const SLIDES: Slide[] = [
       "Postgres for durability, an arq worker queue for async click tracking, rate limiting, and fully Dockerized.",
     label: "Architecture",
     bg: "linear-gradient(135deg, #2ea043 0%, #10462a 100%)",
+    variant: "scale"
   },
 ];
 
@@ -73,17 +78,12 @@ export default function ProjectShowcase() {
                 className={classes.media}
                 style={
                   slide.image
-                    ? {
-                        backgroundImage: `url(${slide.image})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }
-                    : { background: slide.bg }
+                    ? { backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }
+                    : { background: "#101218" }
                 }
               >
-                {!slide.image && (
-                  <span className={classes.mediaLabel}>{slide.label}</span>
-                )}
+                {slide.image ? null : <span className={classes.mediaLabel}>{slide.label}</span>}
+                {!slide.image && <SlideVisual variant={slide.variant} />}
               </div>
 
               <div className={classes.text}>

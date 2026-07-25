@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     env: str = "development"
 
     cache_enabled: bool = True
+
+    # Reject registrations whose email domain can't receive mail (MX lookup).
+    # Disabled in tests so the suite never depends on live DNS.
+    verify_email_deliverability: bool = True
+    email_verify_timeout: float = 5.0  # seconds, per DNS query
+
     model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()

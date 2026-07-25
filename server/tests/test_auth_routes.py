@@ -2,9 +2,13 @@
 Integration tests for the auth routes: register, login, and the
 get_current_user dependency guarding an authenticated endpoint.
 """
+import dns.exception
+import dns.resolver
 import pytest
 from httpx import AsyncClient
 
+from app.core.config import settings
+from app.services import auth_service
 from tests.conftest import auth_header
 
 pytestmark = pytest.mark.asyncio
@@ -46,6 +50,103 @@ async def test_register_rejects_bad_email(client: AsyncClient):
         json={"email": "not-an-email", "password": "password123"},
     )
     assert r.status_code == 422
+
+
+# ---- email deliverability (MX) check ----------------------------------------
+
+async def test_register_rejects_undeliverable_domain(client: AsyncClient, monkeypatch):
+    """A syntactically valid email whose domain can't receive mail → 422."""
+    monkeypatch.setattr(settings, "verify_email_deliverability", True)
+
+    async def _reject(email: str) -> bool:
+        return False
+
+    monkeypatch.setattr("app.routes.auth.email_domain_accepts_mail", _reject)
+    r = await client.post(
+        "/auth/register",
+        json={"email": "someone@totally-made-up-xyz.com", "password": "password123"},
+    )
+    assert r.status_code == 422
+    assert "domain" in r.json()["error"].lower()
+
+
+async def test_register_allows_deliverable_domain(client: AsyncClient, monkeypatch):
+    monkeypatch.setattr(settings, "verify_email_deliverability", True)
+
+    async def _accept(email: str) -> bool:
+        return True
+
+    monkeypatch.setattr("app.routes.auth.email_domain_accepts_mail", _accept)
+    r = await client.post(
+        "/auth/register",
+        json={"email": "real@example.com", "password": "password123"},
+    )
+    assert r.status_code == 201
+
+
+# ---- email_domain_accepts_mail unit tests -----------------------------------
+
+class _FakeAnswer:
+    def __init__(self, exchange):
+        self.exchange = exchange
+
+
+def _fake_resolver(monkeypatch, behavior):
+    """Patch the async DNS resolver. `behavior` maps a record type to either a
+    list of answers, or an Exception instance to raise for that lookup."""
+    class _FakeResolver:
+        def __init__(self):
+            self.timeout = None
+            self.lifetime = None
+
+        async def resolve(self, domain, rdtype):
+            result = behavior.get(rdtype, dns.resolver.NoAnswer())
+            if isinstance(result, Exception):
+                raise result
+            return result
+
+    monkeypatch.setattr(
+        auth_service.dns.asyncresolver, "Resolver", lambda: _FakeResolver()
+    )
+
+
+async def test_domain_with_mx_is_deliverable(monkeypatch):
+    _fake_resolver(monkeypatch, {"MX": [_FakeAnswer("mail.example.com.")]})
+    assert await auth_service.email_domain_accepts_mail("a@example.com") is True
+
+
+async def test_null_mx_is_not_deliverable(monkeypatch):
+    # RFC 7505 null MX: a single "." target = explicitly accepts no mail.
+    _fake_resolver(monkeypatch, {"MX": [_FakeAnswer(".")]})
+    assert await auth_service.email_domain_accepts_mail("a@no-mail.example") is False
+
+
+async def test_no_mx_falls_back_to_a_record(monkeypatch):
+    _fake_resolver(monkeypatch, {"MX": dns.resolver.NoAnswer(), "A": ["1.2.3.4"]})
+    assert await auth_service.email_domain_accepts_mail("a@example.com") is True
+
+
+async def test_no_mail_records_is_not_deliverable(monkeypatch):
+    _fake_resolver(
+        monkeypatch,
+        {
+            "MX": dns.resolver.NoAnswer(),
+            "A": dns.resolver.NoAnswer(),
+            "AAAA": dns.resolver.NoAnswer(),
+        },
+    )
+    assert await auth_service.email_domain_accepts_mail("a@example.com") is False
+
+
+async def test_nonexistent_domain_is_not_deliverable(monkeypatch):
+    _fake_resolver(monkeypatch, {"MX": dns.resolver.NXDOMAIN()})
+    assert await auth_service.email_domain_accepts_mail("a@nope.invalid") is False
+
+
+async def test_dns_timeout_fails_open(monkeypatch):
+    # Infrastructure failure must not block legitimate signups.
+    _fake_resolver(monkeypatch, {"MX": dns.exception.Timeout()})
+    assert await auth_service.email_domain_accepts_mail("a@example.com") is True
 
 
 # ---- login ------------------------------------------------------------------

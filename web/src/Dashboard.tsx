@@ -26,26 +26,13 @@ import {
   shortUrl,
   type Link,
 } from "./api";
-import classes from "./Dashboard.module.css";
+import LinkStatsModal from "./LinkStatsModal";
+import classes from "./modules/Dashboard.module.css";
 
 function Logo() {
   return (
     <div className={classes.logo}>
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07"
-          stroke="currentColor"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
-      </svg>
+      <img className={classes.logoImg} src="/url_logo.svg" alt="URL Shorty logo" />
     </div>
   );
 }
@@ -84,6 +71,8 @@ export default function Dashboard({ onLogout }: DashboardProps) {
   const [createError, setCreateError] = useState<string | null>(null);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [statsLink, setStatsLink] = useState<Link | null>(null);
 
   const load = useCallback(async () => {
     setLoadError(null);
@@ -172,9 +161,19 @@ export default function Dashboard({ onLogout }: DashboardProps) {
   const rows = links.map((link) => {
     const full = shortUrl(link.short_code);
     return (
-      <Table.Tr key={link.id}>
+      <Table.Tr
+        key={link.id}
+        className={classes.row}
+        onClick={() => setStatsLink(link)}
+      >
         <Table.Td>
-          <Anchor href={full} target="_blank" rel="noreferrer" fw={600}>
+          <Anchor
+            href={full}
+            target="_blank"
+            rel="noreferrer"
+            fw={600}
+            onClick={(e) => e.stopPropagation()}
+          >
             /{link.short_code}
           </Anchor>
         </Table.Td>
@@ -195,13 +194,29 @@ export default function Dashboard({ onLogout }: DashboardProps) {
         </Table.Td>
         <Table.Td>
           <Group gap="xs" justify="flex-end" wrap="nowrap">
+            <Tooltip label="View analytics" withArrow>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatsLink(link);
+                }}
+                aria-label="View analytics"
+              >
+                <ChartIcon />
+              </ActionIcon>
+            </Tooltip>
             <CopyButton value={full}>
               {({ copied, copy }) => (
                 <Tooltip label={copied ? "Copied!" : "Copy short link"} withArrow>
                   <ActionIcon
                     variant="subtle"
                     color={copied ? "teal" : "gray"}
-                    onClick={copy}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copy();
+                    }}
                     aria-label="Copy short link"
                   >
                     <CopyIcon />
@@ -214,7 +229,10 @@ export default function Dashboard({ onLogout }: DashboardProps) {
                 variant="subtle"
                 color="red"
                 loading={deletingId === link.id}
-                onClick={() => handleDelete(link.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(link.id);
+                }}
                 aria-label="Delete link"
               >
                 <TrashIcon />
@@ -357,6 +375,13 @@ export default function Dashboard({ onLogout }: DashboardProps) {
           </Stack>
         </form>
       </Modal>
+
+      <LinkStatsModal
+        linkId={statsLink?.id ?? null}
+        shortCode={statsLink?.short_code ?? ""}
+        onClose={() => setStatsLink(null)}
+        onUnauthorized={onLogout}
+      />
     </Box>
   );
 }
@@ -369,6 +394,20 @@ function PlusIcon() {
         stroke="currentColor"
         strokeWidth="2.4"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 20V10M10 20V4M16 20v-7M22 20H2"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

@@ -5,7 +5,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
 from app.models import User
-from app.services.auth_service import hash_password, verify_password, create_access_token
+from app.core.config import settings
+from app.services.auth_service import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    email_domain_accepts_mail,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
   
@@ -14,6 +20,11 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)) ->
   existing = await db.scalar(select(User).where(User.email == body.email))
   if existing:
     raise HTTPException(status_code=409, detail="Email already registered")
+  if settings.verify_email_deliverability and not await email_domain_accepts_mail(body.email):
+    raise HTTPException(
+      status_code=422,
+      detail="That email domain can't receive mail — please check for typos",
+    )
   user = User(email=body.email, password_hash=hash_password(body.password))
   db.add(user)
   try:

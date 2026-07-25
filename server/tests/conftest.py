@@ -24,9 +24,18 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 import fakeredis.aioredis
  
 from app.main import app
+from app.core.config import settings
 from app.core.db import get_db, get_redis, get_arq
 from app.models import Base, User
 from app.services.auth_service import hash_password, create_access_token
+
+
+@pytest.fixture(autouse=True)
+def _no_live_dns():
+    """Don't let the email-deliverability MX lookup reach real DNS in tests.
+    Tests that exercise it flip the flag back on and stub the resolver."""
+    settings.verify_email_deliverability = False
+    yield
 
 TEST_DATABASE_URL = os.environ.get(
     "TEST_DATABASE_URL",
