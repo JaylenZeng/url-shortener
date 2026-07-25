@@ -1,0 +1,33 @@
+# Caddy automatically provisions and renews Let's Encrypt TLS certs for any
+# real domain pointed at this host (ports 80 + 443 must be open).
+#
+# Two site blocks resolve the root-path collision between short codes
+# (example.com/{code}, served by the API) and the SPA routes.
+# Replace example.com with your domain before deploying.
+
+# --- Short domain: everything goes to the API (handles /{code} redirects) ---
+example.com {
+	encode gzip zstd
+	reverse_proxy app:8000
+}
+
+# --- App subdomain: SPA static files + same-origin API for /auth and /links ---
+app.example.com {
+	encode gzip zstd
+
+	# API calls hit the backend on the same origin (no CORS needed).
+	@api path /auth/* /links/* /health /ready
+	reverse_proxy @api app:8000
+
+	# Everything else is the React SPA; unknown paths fall back to index.html.
+	root * /srv/app
+	try_files {path} /index.html
+	file_server
+}
+
+# For local testing without a domain, comment out the two blocks above and
+# uncomment this one, then browse to http://localhost (redirects only):
+#
+# :80 {
+# 	reverse_proxy app:8000
+# }
