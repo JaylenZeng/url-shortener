@@ -11,8 +11,8 @@ own routes, so use two names:
 
 | Domain              | Serves                                        |
 | ------------------- | --------------------------------------------- |
-| `example.com`       | Short links / redirects (`/{code}`)           |
-| `app.example.com`   | React dashboard + `/auth`, `/links` API       |
+| `jz-url.xyz`       | Short links / redirects (`/{code}`)           |
+| `app.jz-url.xyz`   | React dashboard + `/auth`, `/links` API       |
 
 Point both at the instance's Elastic IP with A records in Route 53 (or any DNS).
 
