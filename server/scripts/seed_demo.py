@@ -1,11 +1,9 @@
-"""Seed a demo account with realistic data to show off the app in a demo.
+"""
 
 Creates (or resets) a single demo user, a handful of short links that read like
 a real developer's collection, and a month of click events spread across those
 links with believable referrers, user agents, and traffic shapes (a viral
 launch spike, steady evergreen links, a slow-burn grower, and some sparse ones).
-That's enough to make every screen — the link list, per-link analytics, the
-clicks-by-day chart, top referrers, and top user agents — look alive.
 
 The script talks to the database directly (it does not go through the HTTP API),
 so it skips email-deliverability checks and rate limits.
@@ -70,26 +68,26 @@ random.seed(42)
 #   sparse  — a trickle of clicks
 # ---------------------------------------------------------------------------
 LINKS = [
-    dict(alias="launch", url="https://www.producthunt.com/posts/shortlink",
+    dict(alias="launch", url="https://app.jz-url.xyz/",
          total=780, shape="viral", days_ago_created=34),
     dict(alias="gh", url="https://github.com/jaylenzeng/url-shortener",
          total=420, shape="steady", days_ago_created=45),
-    dict(alias="blog", url="https://jaylen.dev/blog/scaling-a-url-shortener",
+    dict(alias="linkedin", url="https://www.linkedin.com/in/jaylen-zeng/",
          total=360, shape="growing", days_ago_created=40),
-    dict(alias="resume", url="https://jaylen.dev/resume.pdf",
+    dict(alias="portfolio", url="https://jaylen-zeng-portfolio.vercel.app/",
          total=95, shape="steady", days_ago_created=50),
-    dict(alias="talk", url="https://slides.com/jaylen/redis-click-pipeline",
+    dict(alias="pomodoro", url="https://pomodoro-flow-jz.vercel.app/",
          total=210, shape="viral", days_ago_created=20),
-    dict(alias="docs", url="https://docs.short.link/getting-started",
+    dict(alias="docs", url="https://jz-url.xyz/docs",
          total=140, shape="growing", days_ago_created=38),
-    dict(alias="newsletter", url="https://jaylen.substack.com/subscribe",
+    dict(alias="profile", url="https://github.com/JaylenZeng",
          total=88, shape="steady", days_ago_created=33),
     dict(alias=None, url="https://arxiv.org/abs/2401.01234",
          total=24, shape="sparse", days_ago_created=42),
-    dict(alias="sale", url="https://shop.example.com/black-friday",
+    dict(alias="nrg", url="https://www.vlr.gg/542272/nrg-vs-fnatic-valorant-champions-2025-gf",
          total=160, shape="viral", days_ago_created=12,
          expires_in_days=7),
-    dict(alias="webinar", url="https://zoom.us/webinar/register/abc123",
+    dict(alias="x", url="https://x.com/home",
          total=12, shape="sparse", days_ago_created=6,
          expires_in_days=3),
 ]
