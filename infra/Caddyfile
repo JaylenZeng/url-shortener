@@ -18,7 +18,8 @@ app.jz-url.xyz {
 	# Use handle blocks so try_files (below) never rewrites API paths before
 	# they're proxied — otherwise POST /auth/* falls through to the static
 	# file server, which only allows GET/HEAD and returns 405.
-	@api path /auth/* /links/* /health /ready
+	# /links (bare) is the list/create endpoint; /links/* covers /{id}/stats etc.
+	@api path /auth/* /links /links/* /health /ready
 	handle @api {
 		reverse_proxy app:8000
 	}
