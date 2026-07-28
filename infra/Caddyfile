@@ -15,13 +15,20 @@ app.jz-url.xyz {
 	encode gzip zstd
 
 	# API calls hit the backend on the same origin (no CORS needed).
+	# Use handle blocks so try_files (below) never rewrites API paths before
+	# they're proxied — otherwise POST /auth/* falls through to the static
+	# file server, which only allows GET/HEAD and returns 405.
 	@api path /auth/* /links/* /health /ready
-	reverse_proxy @api app:8000
+	handle @api {
+		reverse_proxy app:8000
+	}
 
 	# Everything else is the React SPA; unknown paths fall back to index.html.
-	root * /srv/app
-	try_files {path} /index.html
-	file_server
+	handle {
+		root * /srv/app
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 # For local testing without a domain, comment out the two blocks above and
